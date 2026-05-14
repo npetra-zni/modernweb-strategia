@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ModernWeb – Stratégiai Prezentáció 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --dark: #0A0A0A;
+    --navy: #1A1A2E;
+    --red: #EC3435;
+    --red-light: #ff5a5b;
+    --white: #FFFFFF;
+    --light: #F5F7FF;
+    --gray: #6B7280;
+    --gray-light: #E5E7EB;
+    --green: #10B981;
+    --blue: #3B82F6;
+    --amber: #F59E0B;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* ── SLIDESHOW ── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity .4s ease;
+    overflow: hidden;
+  }
+  .slide.active { opacity: 1; pointer-events: all; }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.15);
+    padding: 10px 20px; border-radius: 40px;
+    z-index: 999;
+  }
+  .nav button {
+    background: none; border: none; cursor: pointer;
+    color: #fff; font-size: 18px; padding: 4px 8px;
+    border-radius: 6px; transition: background .2s;
+  }
+  .nav button:hover { background: rgba(255,255,255,.15); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+  .counter {
+    color: rgba(255,255,255,.7); font-size: 13px;
+    min-width: 60px; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .dots {
+    display: flex; gap: 6px;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,.3);
+    transition: all .3s;
+    cursor: pointer;
+  }
+  .dot.active { background: var(--red); width: 18px; border-radius: 3px; }
+
+  /* Progress bar */
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: var(--red); transition: width .4s ease;
+    z-index: 1000;
+  }
+
+  /* ── SLIDE TEMPLATES ── */
+
+  /* Cover */
+  .s-cover {
+    background: var(--dark);
+    justify-content: center; align-items: center;
+    text-align: center;
+    padding: 60px;
+  }
+  .s-cover .logo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--red); color: #fff;
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; letter-spacing: .5px;
+    margin-bottom: 32px; text-transform: uppercase;
+  }
+  .s-cover h1 {
+    font-size: clamp(36px, 5vw, 64px);
+    color: #fff; font-weight: 800; line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .s-cover h1 span { color: var(--red); }
+  .s-cover .subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: rgba(255,255,255,.6);
+    max-width: 600px; line-height: 1.5;
+    margin-bottom: 48px;
+  }
+  .s-cover .meta {
+    display: flex; gap: 32px; justify-content: center;
+    flex-wrap: wrap;
+  }
+  .s-cover .meta-item {
+    color: rgba(255,255,255,.5); font-size: 14px;
+  }
+  .s-cover .meta-item strong { color: #fff; display: block; font-size: 16px; }
+
+  /* Standard two-column */
+  .s-two {
+    background: var(--light);
+    flex-direction: row;
+  }
+  .s-two .left {
+    width: 40%; background: var(--navy);
+    display: flex; flex-direction: column;
+    justify-content: center; padding: 60px 48px;
+    color: #fff;
+  }
+  .s-two .right {
+    width: 60%; padding: 60px 56px;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow-y: auto;
+  }
+  .s-two .left .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--red);
+    margin-bottom: 16px;
+  }
+  .s-two .left h2 {
+    font-size: clamp(24px, 3vw, 38px); font-weight: 800;
+    line-height: 1.15; margin-bottom: 20px;
+  }
+  .s-two .left p { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.7; }
+
+  /* Dark slide */
+  .s-dark {
+    background: var(--navy);
+    padding: 60px 80px;
+    justify-content: center;
+    color: #fff;
+  }
+  .s-dark .section-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--red);
+    margin-bottom: 16px;
+  }
+  .s-dark h2 {
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 800; line-height: 1.15;
+    margin-bottom: 40px;
+  }
+
+  /* White slide */
+  .s-white {
+    background: #fff;
+    padding: 60px 80px;
+    justify-content: center;
+  }
+  .s-white .section-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--red);
+    margin-bottom: 16px;
+  }
+  .s-white h2 {
+    font-size: clamp(24px, 3vw, 40px);
+    font-weight: 800; line-height: 1.15;
+    color: var(--dark); margin-bottom: 40px;
+  }
+
+  /* ── UI COMPONENTS ── */
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+
+  .card {
+    background: var(--light); border-radius: 16px;
+    padding: 24px; border: 1px solid var(--gray-light);
+  }
+  .card.dark { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); color: #fff; }
+  .card.red { background: var(--red); color: #fff; border-color: transparent; }
+  .card.green { background: #ECFDF5; border-color: #6EE7B7; }
+  .card.amber { background: #FFFBEB; border-color: #FCD34D; }
+
+  .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+  .card p { font-size: 14px; line-height: 1.6; color: inherit; opacity: .85; }
+  .card .icon { font-size: 28px; margin-bottom: 12px; }
+  .card .number {
+    font-size: 36px; font-weight: 900; color: var(--red);
+    line-height: 1; margin-bottom: 6px;
+  }
+  .card.dark .number { color: var(--red-light); }
+
+  .tag-pill {
+    display: inline-block;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .tag-pill.red { background: rgba(236,52,53,.15); color: var(--red); }
+  .tag-pill.green { background: #ECFDF5; color: #059669; }
+  .tag-pill.blue { background: #EFF6FF; color: #2563EB; }
+  .tag-pill.amber { background: #FFFBEB; color: #D97706; }
+
+  .list-check { list-style: none; }
+  .list-check li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 15px; line-height: 1.5; margin-bottom: 12px;
+  }
+  .list-check li::before {
+    content: "✓"; color: var(--green);
+    font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  }
+  .list-check.white li::before { color: #6EE7B7; }
+
+  .list-x { list-style: none; }
+  .list-x li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 15px; line-height: 1.5; margin-bottom: 12px;
+  }
+  .list-x li::before {
+    content: "✗"; color: var(--red);
+    font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  }
+
+  .big-quote {
+    font-size: clamp(24px, 3vw, 42px);
+    font-weight: 800; line-height: 1.2;
+    color: #fff;
+    border-left: 4px solid var(--red);
+    padding-left: 24px;
+  }
+
+  .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table th {
+    background: var(--red); color: #fff;
+    padding: 10px 14px; text-align: left; font-weight: 600;
+    font-size: 12px; letter-spacing: .5px;
+  }
+  .table td { padding: 10px 14px; border-bottom: 1px solid var(--gray-light); }
+  .table tr:last-child td { border-bottom: none; }
+  .table tr:nth-child(even) td { background: var(--light); }
+  .table.dark th { background: rgba(255,255,255,.1); }
+  .table.dark td { border-color: rgba(255,255,255,.08); color: rgba(255,255,255,.85); }
+  .table.dark tr:nth-child(even) td { background: rgba(255,255,255,.04); }
+
+  .highlight-box {
+    background: rgba(236,52,53,.1);
+    border: 1px solid rgba(236,52,53,.3);
+    border-left: 4px solid var(--red);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+  }
+  .highlight-box p { font-size: 15px; line-height: 1.6; }
+  .highlight-box.dark-bg {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.15);
+    border-left-color: var(--red);
+  }
+
+  /* Timeline */
+  .timeline { display: flex; gap: 0; }
+  .timeline-item {
+    flex: 1; position: relative;
+    padding: 20px 16px 20px 0;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute; top: 32px; left: 0; right: 0; height: 3px;
+    background: rgba(255,255,255,.15);
+  }
+  .timeline-item:last-child::before { right: 50%; }
+  .timeline-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--red);
+    position: absolute; top: 26px; left: 0;
+    border: 2px solid var(--navy);
+    z-index: 1;
+  }
+  .timeline-item .week-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    color: var(--red); text-transform: uppercase;
+    margin-bottom: 8px; padding-left: 20px;
+    margin-top: 20px;
+  }
+  .timeline-item ul {
+    list-style: none; padding-left: 20px;
+  }
+  .timeline-item ul li {
+    font-size: 12px; color: rgba(255,255,255,.8);
+    line-height: 1.5; margin-bottom: 5px;
+    padding-left: 12px; position: relative;
+  }
+  .timeline-item ul li::before {
+    content: '·'; position: absolute; left: 0;
+    color: var(--red);
+  }
+
+  /* Funnel */
+  .funnel-steps { display: flex; flex-direction: column; gap: 8px; }
+  .funnel-step {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 20px; border-radius: 10px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+  }
+  .funnel-step .funnel-icon { font-size: 22px; flex-shrink: 0; }
+  .funnel-step h4 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .funnel-step p { font-size: 12px; color: rgba(255,255,255,.55); }
+  .funnel-arrow { text-align: center; color: var(--red); font-size: 18px; margin: -2px 0; }
+
+  /* Step badge */
+  .step-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--red); color: #fff;
+    font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  /* Big number stat */
+  .stat-row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat {
+    flex: 1; min-width: 100px;
+    text-align: center;
+  }
+  .stat .stat-num {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 900; color: var(--red);
+    line-height: 1;
+  }
+  .stat .stat-label {
+    font-size: 13px; color: rgba(255,255,255,.55);
+    margin-top: 6px; line-height: 1.4;
+  }
+
+  /* Week plan */
+  .week-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .week-card {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px; padding: 20px;
+    border-top: 3px solid var(--red);
+  }
+  .week-card .week-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--red); margin-bottom: 8px;
+  }
+  .week-card h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+  .week-card ul { list-style: none; }
+  .week-card ul li {
+    font-size: 12px; color: rgba(255,255,255,.7);
+    padding: 5px 0 5px 16px; position: relative;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    line-height: 1.4;
+  }
+  .week-card ul li:last-child { border: none; }
+  .week-card ul li::before { content: '→'; position: absolute; left: 0; color: var(--red); }
+
+  /* Priority list */
+  .priority-list { display: flex; flex-direction: column; gap: 12px; }
+  .priority-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px; border-radius: 12px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+  }
+  .priority-item .p-num {
+    font-size: 28px; font-weight: 900;
+    color: rgba(255,255,255,.12); flex-shrink: 0;
+    width: 40px; line-height: 1;
+  }
+  .priority-item h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .priority-item p { font-size: 13px; color: rgba(255,255,255,.55); }
+  .priority-item .badge {
+    margin-left: auto; flex-shrink: 0;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    background: var(--red); color: #fff;
+  }
+  .priority-item .badge.green { background: var(--green); }
+  .priority-item .badge.amber { background: var(--amber); color: #000; }
+
+  /* Persona cards */
+  .persona {
+    background: rgba(255,255,255,.05); border-radius: 16px;
+    padding: 24px; border: 1px solid rgba(255,255,255,.1);
+  }
+  .persona .avatar {
+    font-size: 36px; margin-bottom: 12px;
+  }
+  .persona h3 { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .persona .role { font-size: 12px; color: var(--red); margin-bottom: 14px; }
+  .persona .fear, .persona .want {
+    font-size: 13px; line-height: 1.5;
+    padding: 10px 12px; border-radius: 8px; margin-bottom: 8px;
+  }
+  .persona .fear { background: rgba(236,52,53,.1); color: rgba(255,255,255,.8); }
+  .persona .want { background: rgba(16,185,129,.1); color: rgba(255,255,255,.8); }
+  .persona .fear::before { content: '😟 Fél: '; font-weight: 700; }
+  .persona .want::before { content: '✨ Vágy: '; font-weight: 700; }
+
+  /* Slide header */
+  .slide-header {
+    padding: 32px 80px 0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .slide-header .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--red);
+  }
+  .slide-header .slide-logo {
+    font-size: 13px; font-weight: 700; color: rgba(255,255,255,.4);
+  }
+
+  /* Compact list for dark bg */
+  .compact-list { list-style: none; }
+  .compact-list li {
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08);
+    font-size: 14px; color: rgba(255,255,255,.8);
+    display: flex; gap: 12px; align-items: flex-start;
+    line-height: 1.5;
+  }
+  .compact-list li:last-child { border: none; }
+  .compact-list li span { color: var(--red); flex-shrink: 0; }
+
+  /* Emoji highlight */
+  .em { font-style: normal; }
+
+  /* Big action box */
+  .action-box {
+    background: var(--red);
+    border-radius: 20px; padding: 32px 40px;
+    text-align: center; color: #fff;
+  }
+  .action-box h3 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+  .action-box p { font-size: 16px; opacity: .85; }
+
+  /* ── CHECKLIST ── */
+  .cl-group {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .cl-group-title {
+    font-size: 12px; font-weight: 700; letter-spacing: .5px;
+    color: var(--red); text-transform: uppercase;
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .cl-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    font-size: 14px; color: rgba(255,255,255,.8);
+    line-height: 1.4; transition: color .2s;
+    user-select: none;
+  }
+  .cl-item:last-child { border: none; padding-bottom: 0; }
+  .cl-item:hover { color: #fff; }
+  .cl-item input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none;
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid rgba(255,255,255,.2);
+    background: transparent; cursor: pointer;
+    flex-shrink: 0; position: relative;
+    transition: all .2s;
+  }
+  .cl-item input[type="checkbox"]:checked {
+    background: var(--green); border-color: var(--green);
+  }
+  .cl-item input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    color: #fff; font-size: 12px; font-weight: 700;
+  }
+  .cl-item input[type="checkbox"]:checked + span,
+  .cl-item:has(input:checked) {
+    color: rgba(255,255,255,.4);
+    text-decoration: line-through;
+    text-decoration-color: rgba(255,255,255,.2);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .s-dark, .s-white { padding: 40px 32px; }
+    .s-two .left { display: none; }
+    .s-two .right { width: 100%; padding: 40px 32px; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .week-grid { grid-template-columns: 1fr 1fr; }
+    .s-cover { padding: 40px 24px; }
+    .slide-header { padding: 24px 32px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 1 – COVER
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-cover active">
+  <div class="logo-badge">ModernWeb by ZNiTech</div>
+  <h1>Marketing Stratégia<br><span>2026</span></h1>
+  <p class="subtitle">
+    A teljes marketing funnel újjáépítése — <br>
+    helyzetelemzéstől a konkrét akciótervig
+  </p>
+  <div class="meta">
+    <div class="meta-item"><strong>11</strong> stratégiai fejezet</div>
+    <div class="meta-item"><strong>Petra</strong> számára készült</div>
+    <div class="meta-item"><strong>2025</strong> — Azonnal indítható</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 2 – HELYZETELEMZÉS: Ahol most állunk
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 32px;">
+    <span class="section-label">01 — Helyzetelemzés</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Jó alap, gyenge funnel,<br>nulla tartalom</h2>
+  <div class="grid-2">
+    <div>
+      <div class="tag-pill green">Erősségek ✓</div>
+      <ul class="list-check white">
+        <li>Személyes hang — founder-led brand (Petra)</li>
+        <li>Átlátható árazás — ritka a piacon</li>
+        <li>Konverzióra optimalizált single-page struktúra</li>
+        <li>Autentikus testimonialok névvel, képpel</li>
+        <li>Erős design érzék</li>
+      </ul>
+    </div>
+    <div>
+      <div class="tag-pill red">Gyengeségek ✗</div>
+      <ul class="list-x">
+        <li style="color:rgba(255,255,255,.8)">Nincs blog — 0 organikus SEO forgalom</li>
+        <li style="color:rgba(255,255,255,.8)">Nincs lead magnet — mindenki elvész aki nem dönt most</li>
+        <li style="color:rgba(255,255,255,.8)">Nincs email lista — nincs utánkövetés, nurturing</li>
+        <li style="color:rgba(255,255,255,.8)">Nincs case study — nincs mérhető eredmény</li>
+        <li style="color:rgba(255,255,255,.8)">"Mindenkinek" pozicionálás — senki sem érzi magát megszólítva</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 3 – HELYZETELEMZÉS: A piaci rés
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">01 — Helyzetelemzés</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>A piaci rés:<br>senki nem épített SEO tartalomgépet</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <div>
+      <p style="color:rgba(255,255,255,.6); margin-bottom:16px; font-size:14px;">Versenytársak — mit tanulhatunk tőlük</p>
+      <table class="table dark">
+        <thead>
+          <tr><th>Versenytárs</th><th>Legfontosabb tanulság</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Webnode</td><td>Azonnali értékadás csökkenti a fricciót</td></tr>
+          <tr><td>Plus Kreativ</td><td>Revenue-fókuszú üzenet + tartalommarketing</td></tr>
+          <tr><td>Doppio Creative</td><td>Thought leadership = erős differenciátor</td></tr>
+          <tr><td>ForWeb</td><td>Videó testimonial + számok = bizalom</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="highlight-box dark-bg">
+        <p style="color:#fff; font-weight:700; font-size:16px; margin-bottom:10px;">🎯 A mi lehetőségünk</p>
+        <ul class="compact-list">
+          <li><span>→</span> Részletes blog cikkek: „Mennyibe kerül egy weboldal 2025-ben?"</li>
+          <li><span>→</span> Iparági céloldalak: „Fodrász weboldal", „Kozmetikus weboldal"</li>
+          <li><span>→</span> Összehasonlító oldalak: „ModernWeb vs. freelancer"</li>
+        </ul>
+      </div>
+      <div class="highlight-box" style="margin-top:16px; background:rgba(236,52,53,.15); border-color:rgba(236,52,53,.4);">
+        <p style="color:#fff; font-weight:700;">Aki először foglalja le ezt a tartalomterületet, az fogja dominálni a piacot.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 4 – POZICIONÁLÁS: Az üzenet
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 40px;">
+    <span class="section-label">02 — Pozicionálás</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <p style="color:rgba(255,255,255,.5); margin-bottom:20px; font-size:15px;">A jelenlegi pozicionálás túl általános. Az új:</p>
+  <div class="big-quote">
+    „Weboldal, ami ügyfeleket hoz —<br>nem csak szép."
+  </div>
+  <div class="grid-3" style="margin-top:40px;">
+    <div class="card dark">
+      <div class="icon">⚡</div>
+      <h3>Gyorsaság</h3>
+      <p>„2-4 héten belül kész, garancia" — a freelancerekkel szemben akik eltűnnek</p>
+    </div>
+    <div class="card dark">
+      <div class="icon">💡</div>
+      <h3>Átláthatóság</h3>
+      <p>„Tudod mit kapsz és mennyiért" — ügynökségekkel szemben ahol az ár titok</p>
+    </div>
+    <div class="card dark">
+      <div class="icon">🤝</div>
+      <h3>Partnerség</h3>
+      <p>„Nem csak elkészítjük, hanem mellette vagyunk" — utógondozás benne van</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 5 – POZICIONÁLÁS: 3 célpersona
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 32px;">
+    <span class="section-label">02 — Pozicionálás</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>3 fő célpersona</h2>
+  <div class="grid-3">
+    <div class="persona">
+      <div class="avatar">🌱</div>
+      <h3>Induló vállalkozó</h3>
+      <div class="role">Fodrász, kozmetikus, asztalos, könyvelő...</div>
+      <div class="fear">Drága lesz és nem értem majd hogyan müxik</div>
+      <div class="want">Valaki csinálja meg helyette, ne kelljen tanulni</div>
+    </div>
+    <div class="persona">
+      <div class="avatar">😤</div>
+      <h3>Frusztrált vállalkozó</h3>
+      <div class="role">Volt már weboldal — nem müxött</div>
+      <div class="fear">Megint kiadok pénzt valamire ami nem fog müxni</div>
+      <div class="want">Valaki akiben megbízhat, aki garantál eredményt</div>
+    </div>
+    <div class="persona">
+      <div class="avatar">🚀</div>
+      <h3>Növekvő KKV</h3>
+      <div class="role">Növekedési fázisban, komoly online jelenlét kell</div>
+      <div class="fear">Nem lesz elég profi / skálázható</div>
+      <div class="want">Stratégiai partner, nem csak kivitelező</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 6 – POZICIONÁLÁS: Mátrix
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 32px;">
+    <span class="section-label">02 — Pozicionálás</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>ModernWeb vs. alternatívák</h2>
+  <table class="table dark" style="width:100%;">
+    <thead>
+      <tr>
+        <th></th>
+        <th>DIY (Wix/Webnode)</th>
+        <th>Freelancer</th>
+        <th>Nagy ügynökség</th>
+        <th style="background:#EC3435;">✦ ModernWeb</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color:#fff;">Ár</strong></td>
+        <td>Olcsó</td><td>Változó</td><td>Drága</td>
+        <td><strong style="color:#EC3435;">Átlátható közép</strong></td>
+      </tr>
+      <tr>
+        <td><strong style="color:#fff;">Minőség</strong></td>
+        <td>Generikus</td><td>Kockázatos</td><td>Magas</td>
+        <td><strong style="color:#EC3435;">Magas</strong></td>
+      </tr>
+      <tr>
+        <td><strong style="color:#fff;">Sebesség</strong></td>
+        <td>Azonnali</td><td>Lassú (eltűnik)</td><td>Lassú</td>
+        <td><strong style="color:#EC3435;">Gyors + határidős</strong></td>
+      </tr>
+      <tr>
+        <td><strong style="color:#fff;">Bizalom</strong></td>
+        <td>Nincs</td><td>Alacsony</td><td>Közepes</td>
+        <td><strong style="color:#EC3435;">Magas (személyes)</strong></td>
+      </tr>
+      <tr>
+        <td><strong style="color:#fff;">Utógondozás</strong></td>
+        <td>Nincs</td><td>Nincs</td><td>Drága</td>
+        <td><strong style="color:#EC3435;">Benne van</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 7 – MARKETING FUNNEL: Architektúra
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">03 — Marketing Funnel</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Jelenlegi vs. új funnel</h2>
+  <div class="grid-2" style="gap:32px; align-items:start;">
+    <div>
+      <div class="tag-pill red" style="margin-bottom:16px;">Jelenlegi — elveszíti az érdeklődők 80%-át</div>
+      <div class="funnel-steps">
+        <div class="funnel-step"><div class="funnel-icon">📣</div><div><h4>Hirdetés</h4><p>Google / Meta</p></div></div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step"><div class="funnel-icon">🏠</div><div><h4>Főoldal</h4><p>Csak egyetlen lehetőség</p></div></div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step"><div class="funnel-icon">📋</div><div><h4>„Ajánlatot kérek"</h4><p>Nagy elköteleződés — sokan feladják</p></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="tag-pill green" style="margin-bottom:16px;">Új funnel — mindenkit megfog és vezet</div>
+      <div class="funnel-steps">
+        <div class="funnel-step"><div class="funnel-icon">🔍</div><div><h4>TOFU — Tudatosság</h4><p>SEO blog · Google Ads · Meta Ads · Instagram</p></div></div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step"><div class="funnel-icon">💌</div><div><h4>MOFU — Mérlegelés</h4><p>Lead magnet · Email sorozat · Case study</p></div></div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step"><div class="funnel-icon">🗓️</div><div><h4>BOFU — Döntés</h4><p>Ingyenes konzultáció · Calendly · Ajánlat</p></div></div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step"><div class="funnel-icon">⭐</div><div><h4>Referral</h4><p>Case study · Ajánlói program</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 8 – FUNNEL: Konverzió optimalizálás
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 32px;">
+    <span class="section-label">03 — Marketing Funnel</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>KPI-ok — mit mérünk</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <table class="table dark">
+      <thead><tr><th>Funnel szint</th><th>Metrika</th><th>Cél</th></tr></thead>
+      <tbody>
+        <tr><td>TOFU</td><td>Organikus forgalom</td><td>500–1.000/hó</td></tr>
+        <tr><td>MOFU</td><td>Lead magnet konverzió</td><td>2–5% látogatóból</td></tr>
+        <tr><td>MOFU</td><td>Email open rate</td><td>>30%</td></tr>
+        <tr><td>BOFU</td><td>Konzultáció foglalás</td><td>X db/hó</td></tr>
+        <tr><td>BOFU</td><td>Ajánlat → megrendelés</td><td>>30%</td></tr>
+        <tr><td>Retention</td><td>Üzemeltetési arány</td><td>>50% aktív marad</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <p style="color:var(--red); font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;">Frikciócsökkentő lépések</p>
+      <ul class="list-check white">
+        <li>Calendly integráció — azonnali foglalás, nincs emailezés</li>
+        <li>15 perces ingyenes konzultáció CTA — kisebb elköteleződés</li>
+        <li>Chat widget (Crisp/Tawk.to) — azonnali válasz lehetőség</li>
+        <li>Social proof közvetlenül a CTA gombok mellett</li>
+        <li>A/B teszt: „Ajánlatot kérek" vs. „Ingyenes konzultáció"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 9 – LEAD MAGNET
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">04 — Lead Magnet</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>A fő lead magnet: „10 hiba,<br>ami miatt a weboldalad nem hoz ügyfeleket"</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:16px;">Ingyenes PDF útmutató — email cím fejében</p>
+      <div class="grid-2" style="gap:12px;">
+        <div class="card dark" style="padding:16px;">
+          <div style="font-size:11px; color:var(--red); font-weight:700; margin-bottom:8px;">HIBA #1</div>
+          <p style="font-size:13px;">Nincs egyértelmű CTA</p>
+        </div>
+        <div class="card dark" style="padding:16px;">
+          <div style="font-size:11px; color:var(--red); font-weight:700; margin-bottom:8px;">HIBA #2</div>
+          <p style="font-size:13px;">Lassú betöltés</p>
+        </div>
+        <div class="card dark" style="padding:16px;">
+          <div style="font-size:11px; color:var(--red); font-weight:700; margin-bottom:8px;">HIBA #3</div>
+          <p style="font-size:13px;">Nem mobilbarát</p>
+        </div>
+        <div class="card dark" style="padding:16px;">
+          <div style="font-size:11px; color:var(--red); font-weight:700; margin-bottom:8px;">HIBA #4–10</div>
+          <p style="font-size:13px;">Bizalomhiány, SEO, mérés...</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:16px;">A letöltés utáni email flow (5 email)</p>
+      <ul class="compact-list">
+        <li><span>E1</span> Azonnal: PDF letöltési link + bemutatkozás</li>
+        <li><span>E2</span> 3. nap: 3 ok amiért a legtöbb oldal nem hoz ügyfeleket</li>
+        <li><span>E3</span> 7. nap: Case study — konkrét ügyfél előtte-utána</li>
+        <li><span>E4</span> 12. nap: „Kérdésem lenne — szabad 15 percre?" → Calendly</li>
+        <li><span>E5</span> 21. nap: Hírlevél feliratkozás + ajánlat emlékeztető</li>
+      </ul>
+      <div class="highlight-box dark-bg" style="margin-top:16px;">
+        <p style="color:#fff; font-size:13px;">Platform: <strong>Mailerlite</strong> — GDPR-kompatibilis, ingyenes 1.000 főig, automatizálás beépítve</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 10 – EMAIL MARKETING
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 32px;">
+    <span class="section-label">05 — Email Marketing</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Az email lista az egyetlen<br>csatorna ahol te irányítasz</h2>
+  <div class="grid-3" style="gap:20px; align-items:start; margin-bottom:28px;">
+    <div class="card dark">
+      <div class="icon">📩</div>
+      <h3>Welcome Sequence</h3>
+      <p>5 email, 21 nap alatt. Automatikus. Bemutatkozástól konzultáció ajánlatig vezet.</p>
+    </div>
+    <div class="card dark">
+      <div class="icon">📅</div>
+      <h3>Havi hírlevél</h3>
+      <p>1 hasznos tipp, 1 referencia, 1 soft CTA. Rövid, értékes, nem tolakodó.</p>
+    </div>
+    <div class="card dark">
+      <div class="icon">🎯</div>
+      <h3>Szegmentálás</h3>
+      <p>„Nincs még oldala" vs. „már van de nem müxik" — különböző ajánlat mindkettőnek.</p>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Email feliratkozó ma</div></div>
+    <div class="stat"><div class="stat-num">300–500</div><div class="stat-label">Cél 12 hónap alatt</div></div>
+    <div class="stat"><div class="stat-num">&gt;30%</div><div class="stat-label">Cél open rate</div></div>
+    <div class="stat"><div class="stat-num">2–5%</div><div class="stat-label">Konverziós cél</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 11 – SEO & BLOG STRATÉGIA
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">06 — SEO & Blog</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>SEO: az önfenntartó forgalom forrása</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Első 5 blog cikk — magas keresési szándék</p>
+      <ul class="compact-list">
+        <li><span>1.</span> „Mennyibe kerül egy weboldal 2025-ben?" — legtöbb keresés</li>
+        <li><span>2.</span> „Wix vs. WordPress vs. egyedi fejlesztés"</li>
+        <li><span>3.</span> „Miért nem hoz ügyfeleket a weboldalad?"</li>
+        <li><span>4.</span> „Hogyan válasszak webfejlesztőt?"</li>
+        <li><span>5.</span> „Landing oldal vs. weboldal — mi a különbség?"</li>
+      </ul>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Iparági landing oldalak (SEO + Ads)</p>
+      <div class="grid-2" style="gap:10px;">
+        <div class="card dark" style="padding:14px;">
+          <p style="font-size:13px;">/fodrasz-weboldal/</p>
+        </div>
+        <div class="card dark" style="padding:14px;">
+          <p style="font-size:13px;">/kozmetikus-weboldal/</p>
+        </div>
+        <div class="card dark" style="padding:14px;">
+          <p style="font-size:13px;">/ettermo-weboldal/</p>
+        </div>
+        <div class="card dark" style="padding:14px;">
+          <p style="font-size:13px;">/ugyvedi-weboldal/</p>
+        </div>
+      </div>
+      <div class="highlight-box dark-bg" style="margin-top:16px;">
+        <p style="color:#fff; font-size:13px;">SEO eszközök: <strong>Rank Math</strong> (WordPress), <strong>Google Search Console</strong>, <strong>Google Analytics 4</strong> — mind ingyenes</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 12 – SEO TARTALOM NAPTÁR
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">06 — SEO & Blog</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>12 hónapos tartalom célok</h2>
+  <div class="grid-2" style="gap:28px; align-items:center;">
+    <div class="stat-row" style="flex-direction:column; gap:20px;">
+      <div class="stat" style="text-align:left; display:flex; align-items:center; gap:20px;">
+        <div class="stat-num" style="font-size:48px; min-width:80px;">0</div>
+        <div class="stat-label" style="color:rgba(255,255,255,.7); text-align:left;">Blog cikk ma</div>
+      </div>
+      <div style="color:var(--red); font-size:24px;">↓</div>
+      <div class="stat" style="text-align:left; display:flex; align-items:center; gap:20px;">
+        <div class="stat-num" style="font-size:48px; min-width:80px;">15–20</div>
+        <div class="stat-label" style="color:rgba(255,255,255,.7); text-align:left;">Blog cikk 12 hónap után</div>
+      </div>
+      <div style="color:var(--red); font-size:24px;">↓</div>
+      <div class="stat" style="text-align:left; display:flex; align-items:center; gap:20px;">
+        <div class="stat-num" style="font-size:48px; min-width:80px;">500–1k</div>
+        <div class="stat-label" style="color:rgba(255,255,255,.7); text-align:left;">Organikus látogató/hó (cél)</div>
+      </div>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:16px;">Ütemezés ütemterv</p>
+      <table class="table dark">
+        <thead><tr><th>Időszak</th><th>Fókusz</th><th>Mennyiség</th></tr></thead>
+        <tbody>
+          <tr><td>1. hónap</td><td>1 alapcikk (ár)</td><td>1 cikk</td></tr>
+          <tr><td>2. hónap</td><td>Wix vs. WordPress, hibák</td><td>2 cikk</td></tr>
+          <tr><td>3. hónap</td><td>Webfejlesztő választás, landing</td><td>2 cikk</td></tr>
+          <tr><td>4–12. hó</td><td>Rendszeres publikálás</td><td>2–3/hó</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 13 – GOOGLE ADS
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">07 — Hirdetési Stratégia</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Google Ads — 5 kampány struktúra</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <div>
+      <ul class="compact-list">
+        <li><span>K1</span><div><strong style="color:#fff;">Branded védekezés</strong><br>„modernweb", „petra weboldal" — 1–2e Ft/nap</div></li>
+        <li><span>K2</span><div><strong style="color:#fff;">Általános weboldal-készítés</strong><br>„weboldal készítés", „honlap készítés" — 5–10e Ft/nap</div></li>
+        <li><span>K3</span><div><strong style="color:#fff;">Specifikus szolgáltatások</strong><br>„landing oldal", „webshop" — 3–5e Ft/nap</div></li>
+        <li><span>K4</span><div><strong style="color:#fff;">Iparági kampányok</strong><br>„fodrász weboldal" stb. — 2–3e Ft/nap</div></li>
+        <li><span>K5</span><div><strong style="color:#fff;">Problémaalapú</strong><br>„weboldal nem hoz ügyfeleket" — 3–5e Ft/nap</div></li>
+      </ul>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Kulcs hirdetésszövegek</p>
+      <div class="card dark" style="margin-bottom:12px;">
+        <p style="font-size:13px; line-height:1.7;">"Weboldal 2-4 hét alatt · 100% Átlátható árazás · Garancia az eredményre"</p>
+      </div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">KPI célok</p>
+      <table class="table dark" style="font-size:12px;">
+        <thead><tr><th>Metrika</th><th>Cél</th></tr></thead>
+        <tbody>
+          <tr><td>CTR</td><td>&gt;5%</td></tr>
+          <tr><td>Quality Score</td><td>&gt;7/10</td></tr>
+          <tr><td>Konverziós arány</td><td>&gt;3%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 14 – META ADS
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">07 — Hirdetési Stratégia</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Meta Ads (Facebook + Instagram)</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">4 kreatív irány</p>
+      <ul class="compact-list">
+        <li><span>1.</span><div><strong style="color:#fff;">Before/After karuszel</strong> — legmagasabb CTR<br><span style="color:rgba(255,255,255,.5); font-size:12px;">„Ez volt, ez lett — +40% több megkeresés"</span></div></li>
+        <li><span>2.</span><div><strong style="color:#fff;">Ügyfél testimonial videó</strong> — 30–60 mp<br><span style="color:rgba(255,255,255,.5); font-size:12px;">Felirattal, hangtalanul is érthető</span></div></li>
+        <li><span>3.</span><div><strong style="color:#fff;">Founder content (Petra)</strong> — bizalomépítés<br><span style="color:rgba(255,255,255,.5); font-size:12px;">„Miért csináltam a ModernWebet" — személyes történet</span></div></li>
+        <li><span>4.</span><div><strong style="color:#fff;">Lead magnet hirdetés</strong> — „10 hiba" PDF<br><span style="color:rgba(255,255,255,.5); font-size:12px;">CPL cél: &lt;1.500 Ft</span></div></li>
+      </ul>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Napi budget ajánlás</p>
+      <table class="table dark" style="font-size:13px;">
+        <thead><tr><th>Kampány típus</th><th>Napi</th></tr></thead>
+        <tbody>
+          <tr><td>Lead gen (PDF letöltés)</td><td>2–3e Ft</td></tr>
+          <tr><td>Retargeting</td><td>1–2e Ft</td></tr>
+          <tr><td>Before/After awareness</td><td>2–3e Ft</td></tr>
+          <tr><td>Founder content</td><td>500–1e Ft</td></tr>
+        </tbody>
+      </table>
+      <div class="highlight-box dark-bg" style="margin-top:16px;">
+        <p style="color:#fff; font-size:14px; font-weight:700;">~8–10e Ft/nap Meta Ads összesen<br><span style="font-weight:400; opacity:.7;">≈ 240–300e Ft/hó</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 15 – WEBOLDAL: Főoldal redesign
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">08 — Weboldal & Landing oldalak</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Főoldal — 4 kritikus változtatás</h2>
+  <div class="priority-list">
+    <div class="priority-item">
+      <div class="p-num">01</div>
+      <div>
+        <h4>Hero szöveg újraírása</h4>
+        <p>„Weboldal, ami ügyfeleket hoz — nem csak szép." — outcome-fókuszú headline, rögtön az elejére</p>
+      </div>
+      <div class="badge">Azonnal</div>
+    </div>
+    <div class="priority-item">
+      <div class="p-num">02</div>
+      <div>
+        <h4>Lead magnet szekció beépítése</h4>
+        <p>„Töltsd le ingyen a 10 hiba PDF-et" — email cím gyűjtés direkt a főoldalon</p>
+      </div>
+      <div class="badge">Azonnal</div>
+    </div>
+    <div class="priority-item">
+      <div class="p-num">03</div>
+      <div>
+        <h4>Calendly integráció</h4>
+        <p>„Ingyenes 15 perces konzultáció" gomb — azonnali foglalás, emailezés nélkül</p>
+      </div>
+      <div class="badge">Azonnal</div>
+    </div>
+    <div class="priority-item">
+      <div class="p-num">04</div>
+      <div>
+        <h4>Konverziókövetés</h4>
+        <p>GA4 + Search Console + Microsoft Clarity heatmap — csak mérve javítható</p>
+      </div>
+      <div class="badge amber">1. hét</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 16 – WEBOLDAL: Landing oldal architektúra
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">08 — Weboldal & Landing oldalak</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Landing oldal architektúra<br>— az 1 főoldalból 15–20 dedikált oldal lesz</h2>
+  <div class="grid-3" style="gap:20px;">
+    <div>
+      <div class="tag-pill blue">Szolgáltatás oldalak</div>
+      <ul class="compact-list">
+        <li><span>→</span>/landing-oldal-keszites/</li>
+        <li><span>→</span>/webshop-fejlesztes/</li>
+        <li><span>→</span>/weboldal-redesign/</li>
+        <li><span>→</span>/honlap-keszites/</li>
+      </ul>
+    </div>
+    <div>
+      <div class="tag-pill green">Iparági oldalak</div>
+      <ul class="compact-list">
+        <li><span>→</span>/fodrasz-weboldal/</li>
+        <li><span>→</span>/kozmetikus-weboldal/</li>
+        <li><span>→</span>/ettermo-weboldal/</li>
+        <li><span>→</span>/ugyvedi-weboldal/</li>
+        <li><span>→</span>+8 iparág</li>
+      </ul>
+    </div>
+    <div>
+      <div class="tag-pill amber">Egyéb stratégiai</div>
+      <ul class="compact-list">
+        <li><span>→</span>/ingyenes-utmutato/ (lead magnet)</li>
+        <li><span>→</span>/modernweb-vs-wix/</li>
+        <li><span>→</span>/arazas/ (kalkulátor)</li>
+        <li><span>→</span>/konzultacio/ (Calendly)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box dark-bg" style="margin-top:24px;">
+    <p style="color:#fff;">Minden landing oldal tartalmaz: iparág-specifikus testimonialokat · releváns case study-t · közvetlen Calendly booking-ot</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 17 – SOCIAL MEDIA
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">09 — Social Media</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Instagram fókusz — 4–5 poszt/hét</h2>
+  <div class="grid-2" style="gap:24px; align-items:start;">
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Tartalom mix (heti arány)</p>
+      <div class="priority-list" style="gap:8px;">
+        <div class="priority-item" style="padding:12px 16px;">
+          <div style="font-size:20px;">🔄</div>
+          <div><h4>Before/After (30%)</h4><p>Weboldalak előtte-utána — legmagasabb engagement</p></div>
+        </div>
+        <div class="priority-item" style="padding:12px 16px;">
+          <div style="font-size:20px;">💡</div>
+          <div><h4>Tippek, tanácsok (30%)</h4><p>„3 hiba amit ma is megcsinálhatsz" — megosztható</p></div>
+        </div>
+        <div class="priority-item" style="padding:12px 16px;">
+          <div style="font-size:20px;">👤</div>
+          <div><h4>Behind the scenes (20%)</h4><p>Petra munkája, folyamat, személyes hang</p></div>
+        </div>
+        <div class="priority-item" style="padding:12px 16px;">
+          <div style="font-size:20px;">⭐</div>
+          <div><h4>Ügyfél történetek (20%)</h4><p>Testimonialok, sikertörténetek, eredmények</p></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Eszközök és ütemezés</p>
+      <ul class="compact-list">
+        <li><span>📱</span>CapCut — ingyenes videó szerkesztő Reels-hez</li>
+        <li><span>🎨</span>Canva Pro — brandelt képek, carousel-ek (~6–8e Ft/hó)</li>
+        <li><span>📅</span>Buffer / Later — előre ütemezés (~5–8e Ft/hó)</li>
+      </ul>
+      <div class="highlight-box dark-bg" style="margin-top:20px;">
+        <p style="color:#fff; font-weight:700; margin-bottom:6px;">Reels strategy</p>
+        <p style="color:rgba(255,255,255,.7); font-size:13px;">Rövid, 15–30 másodperces videók = legtöbb organikus elérés Instagramon. Heti 2 Reel + 3 kép/carousel az optimális mix.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 18 – 3 FÁZIS ROADMAP
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">10 — Megvalósítás</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>3 fázis — 6 hónap alatt a teljes gép</h2>
+  <div class="grid-3" style="gap:20px;">
+    <div class="card dark" style="border-top:3px solid var(--red);">
+      <div class="tag-pill red">Fázis 1 — 1. hónap</div>
+      <h3 style="color:#fff; margin-bottom:12px;">Alap kiépítése</h3>
+      <p style="font-size:13px; color:rgba(255,255,255,.7); margin-bottom:14px;">Minden a helyén mielőtt pénzt költünk hirdetésre</p>
+      <ul class="compact-list" style="font-size:12px;">
+        <li><span>✓</span>Lead magnet PDF + landing oldal</li>
+        <li><span>✓</span>Mailerlite + welcome sequence (5 email)</li>
+        <li><span>✓</span>Hero szöveg + Calendly integráció</li>
+        <li><span>✓</span>GA4 + Search Console + Clarity</li>
+        <li><span>✓</span>Első blog cikk (ár témájú)</li>
+      </ul>
+    </div>
+    <div class="card dark" style="border-top:3px solid var(--amber);">
+      <div class="tag-pill amber">Fázis 2 — 2–3. hónap</div>
+      <h3 style="color:#fff; margin-bottom:12px;">Forgalom beindítása</h3>
+      <p style="font-size:13px; color:rgba(255,255,255,.7); margin-bottom:14px;">Organikus és fizetett forgalom, folyamatos lead áramlás</p>
+      <ul class="compact-list" style="font-size:12px;">
+        <li><span>✓</span>Google Ads kampányok indítása</li>
+        <li><span>✓</span>Meta Ads: lead gen kampány</li>
+        <li><span>✓</span>Blog cikkek #2–#5</li>
+        <li><span>✓</span>Első 2 iparági landing oldal</li>
+        <li><span>✓</span>Videó testimonial forgatás</li>
+      </ul>
+    </div>
+    <div class="card dark" style="border-top:3px solid var(--green);">
+      <div class="tag-pill green">Fázis 3 — 4–6. hónap</div>
+      <h3 style="color:#fff; margin-bottom:12px;">Skálázás & Optimalizálás</h3>
+      <p style="font-size:13px; color:rgba(255,255,255,.7); margin-bottom:14px;">Ami müxik, azt skálázni. Ami nem, azt leváltani.</p>
+      <ul class="compact-list" style="font-size:12px;">
+        <li><span>✓</span>Case study oldalak (3–5 db)</li>
+        <li><span>✓</span>Árazás kalkulátor fejlesztése</li>
+        <li><span>✓</span>Iparági oldalak bővítése (+3–4)</li>
+        <li><span>✓</span>Lookalike kampányok Meta-n</li>
+        <li><span>✓</span>Referral program indítása</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 19 – AZONNALI 3 LÉPÉS
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 32px;">
+    <span class="section-label">⚡ Azonnali akció</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>3 lépés, amit ma el kell kezdeni</h2>
+  <div class="priority-list" style="gap:20px;">
+    <div class="priority-item" style="padding:20px 24px; border:2px solid var(--red);">
+      <div class="step-badge" style="width:44px; height:44px; font-size:20px;">1</div>
+      <div>
+        <h4 style="font-size:18px; margin-bottom:6px;">Lead Magnet + Email alap felépítése</h4>
+        <p>A PDF megvan. Mailerlite fiók megnyitása, double opt-in beállítása, 5 email megírása, landing oldal készítése. Ez az egész 1–2 hétnyi munka — és ez generálja az első email listát.</p>
+      </div>
+      <div class="badge">Ez a hét</div>
+    </div>
+    <div class="priority-item" style="padding:20px 24px; border:2px solid rgba(245,158,11,.5);">
+      <div class="step-badge" style="width:44px; height:44px; font-size:20px; background:var(--amber); color:#000;">2</div>
+      <div>
+        <h4 style="font-size:18px; margin-bottom:6px;">Főoldal 3 kulcsváltoztatása</h4>
+        <p>Hero szöveg újraírása outcome-fókuszúra. Lead magnet szekció beépítése. Calendly integráció. Mind alacsony erőfeszítés, magas hatás — azonnali konverziónövelés.</p>
+      </div>
+      <div class="badge amber">2. hét</div>
+    </div>
+    <div class="priority-item" style="padding:20px 24px; border:2px solid rgba(16,185,129,.5);">
+      <div class="step-badge" style="width:44px; height:44px; font-size:20px; background:var(--green);">3</div>
+      <div>
+        <h4 style="font-size:18px; margin-bottom:6px;">Konverziókövetés + első blog cikk</h4>
+        <p>GA4, Search Console, Microsoft Clarity — mind ingyenes, 1 nap alatt beállítható. „Mennyibe kerül egy weboldal 2025-ben?" — ez a cikk hozza majd az organikus forgalmat évekig.</p>
+      </div>
+      <div class="badge green">3–4. hét</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 20 – 1 HÓNAPOS FESZES ÜTEMTERV
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">🗓️ 1 hónapos ütemterv</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>30 nap — hétről hétre</h2>
+  <div class="week-grid">
+    <div class="week-card">
+      <div class="week-num">1. hét · máj. 14–20.</div>
+      <h4>Lead Magnet Alap</h4>
+      <ul>
+        <li>Mailerlite fiók + GDPR beállítás</li>
+        <li>Welcome sequence 5 email megírása</li>
+        <li>/ingyenes-utmutato/ landing oldal</li>
+        <li>PDF letöltés automatizálás tesztelése</li>
+      </ul>
+    </div>
+    <div class="week-card">
+      <div class="week-num">2. hét · máj. 21–27.</div>
+      <h4>Főoldal + Mérés</h4>
+      <ul>
+        <li>Hero szöveg outcome-fókuszúra írva</li>
+        <li>Lead magnet szekció beépítve</li>
+        <li>Calendly integráció beállítva</li>
+        <li>GA4 + Search Console csatolva</li>
+        <li>Microsoft Clarity heatmap aktív</li>
+      </ul>
+    </div>
+    <div class="week-card">
+      <div class="week-num">3. hét · máj. 28. – jún. 3.</div>
+      <h4>Első Blog Cikk</h4>
+      <ul>
+        <li>„Mennyibe kerül egy weboldal 2025-ben?" — megírva + SEO optimalizálva</li>
+        <li>Blog szekció megnyitva az oldalon</li>
+        <li>Rank Math / Yoast beállítva</li>
+        <li>Cikk megosztva social médián</li>
+      </ul>
+    </div>
+    <div class="week-card">
+      <div class="week-num">4. hét · jún. 4–13.</div>
+      <h4>Forgalom &amp; Teszt</h4>
+      <ul>
+        <li>Instagram rendszeres posztolás indítása</li>
+        <li>Meta Ads: lead magnet kampány tesztelése (kisebb budget)</li>
+        <li>Első analytics adatok kiértékelése</li>
+        <li>Hírlevél küldési terv véglegesítése</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box dark-bg" style="margin-top:20px;">
+    <p style="color:#fff;"><strong>Hónap végére:</strong> Van email lista ✓ — Van lead magnet ✓ — Van blog ✓ — Van mérés ✓ — Elindult a forgalom ✓</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 21 – HATÁRIDŐ TÁBLÁZAT
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">🗓️ Határidő táblázat</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Mit mikorra kell befejezni</h2>
+  <table class="table dark" style="width:100%;">
+    <thead>
+      <tr>
+        <th>Határidő</th>
+        <th>Feladat</th>
+        <th>Hatás</th>
+        <th>Státusz</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color:var(--red);">Máj. 20.</strong></td>
+        <td>Mailerlite beállítva + 5 email megírva + PDF landing oldal él</td>
+        <td>Email lista gyűjt</td>
+        <td><span style="color:var(--red);">● Szükséges</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--red);">Máj. 20.</strong></td>
+        <td>Hero szöveg újraírva outcome-fókuszúra</td>
+        <td>Azonnali konverzió↑</td>
+        <td><span style="color:var(--red);">● Szükséges</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--amber);">Máj. 27.</strong></td>
+        <td>Calendly integráció + GA4 + Clarity aktív</td>
+        <td>Fricció↓, mérés indul</td>
+        <td><span style="color:var(--amber);">● Fontos</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--amber);">Jún. 3.</strong></td>
+        <td>Első blog cikk (ár) publikálva, SEO kész</td>
+        <td>Organikus forgalom alap</td>
+        <td><span style="color:var(--amber);">● Fontos</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--green);">Jún. 10.</strong></td>
+        <td>Meta Ads lead gen kampány élő (kis budget)</td>
+        <td>Első fizetett leadek</td>
+        <td><span style="color:var(--green);">● Tervezett</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--green);">Jún. 13.</strong></td>
+        <td>Első 30 nap analytics kiértékelése</td>
+        <td>Adatalapon döntés</td>
+        <td><span style="color:var(--green);">● Tervezett</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 22 – BUDGET & SIKER MÉRŐSZÁMOK
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark">
+  <div class="slide-header" style="padding:0 0 28px;">
+    <span class="section-label">11 — Budget & KPI</span>
+    <span class="slide-logo">modernweb.hu</span>
+  </div>
+  <h2>Budget terv & 12 hónapos célok</h2>
+  <div class="grid-2" style="gap:28px; align-items:start;">
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">Havi cost (2. hónaptól)</p>
+      <table class="table dark" style="font-size:13px;">
+        <thead><tr><th>Tétel</th><th>Havi</th></tr></thead>
+        <tbody>
+          <tr><td>Google Ads</td><td>150–300e Ft</td></tr>
+          <tr><td>Meta Ads</td><td>100–200e Ft</td></tr>
+          <tr><td>Mailerlite</td><td>Ingyenes (1k főig)</td></tr>
+          <tr><td>Microsoft Clarity</td><td>Ingyenes</td></tr>
+          <tr><td>Canva Pro</td><td>~6–8e Ft</td></tr>
+          <tr><td>Buffer/Later</td><td>~5–8e Ft</td></tr>
+          <tr><td><strong style="color:#fff;">Összesen</strong></td><td><strong style="color:var(--red);">250–520e Ft/hó</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="highlight-box dark-bg" style="margin-top:12px;">
+        <p style="color:rgba(255,255,255,.8); font-size:13px;">1. hónapban nincs hirdetési kiadás — alap kiépítés megy.</p>
+      </div>
+    </div>
+    <div>
+      <p style="color:rgba(255,255,255,.6); font-size:14px; margin-bottom:14px;">12 hónapos célok</p>
+      <div class="grid-2" style="gap:12px;">
+        <div class="card dark" style="text-align:center; padding:16px;">
+          <div class="number">500–1k</div>
+          <p style="font-size:12px;">Organikus látogató/hó</p>
+        </div>
+        <div class="card dark" style="text-align:center; padding:16px;">
+          <div class="number">300–500</div>
+          <p style="font-size:12px;">Email feliratkozó</p>
+        </div>
+        <div class="card dark" style="text-align:center; padding:16px;">
+          <div class="number">3–5%</div>
+          <p style="font-size:12px;">Lead magnet konverzió</p>
+        </div>
+        <div class="card dark" style="text-align:center; padding:16px;">
+          <div class="number">+30–50%</div>
+          <p style="font-size:12px;">Projektek száma</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 23 – ZÁRÓ / CTA
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark" style="justify-content:center; align-items:center; text-align:center;">
+  <div style="max-width:700px;">
+    <div class="tag-pill red" style="margin-bottom:24px;">🚀 Most cselekedj</div>
+    <h2 style="font-size:clamp(32px,4vw,52px); margin-bottom:24px;">Az alap kiépítése<br>nem vár tovább</h2>
+    <p style="color:rgba(255,255,255,.65); font-size:18px; line-height:1.7; margin-bottom:40px;">
+      A stratégia kész. A tartalom kész. A lead magnet PDF kész.<br>
+      Az egyetlen kérdés: <strong style="color:#fff;">mikor kezdjük?</strong>
+    </p>
+    <div class="action-box" style="margin-bottom:32px;">
+      <h3>Ez hét prioritás: Lead Magnet + Email alap</h3>
+      <p>Mailerlite megnyitása · 5 email megírása · Landing oldal él · PDF automatizálás</p>
+    </div>
+    <div class="stat-row" style="justify-content:center;">
+      <div class="stat"><div class="stat-num">11</div><div class="stat-label">stratégiai fejezet<br>kidolgozva</div></div>
+      <div class="stat"><div class="stat-num">30</div><div class="stat-label">napon belül<br>az alap kész</div></div>
+      <div class="stat"><div class="stat-num">12</div><div class="stat-label">hónap alatt<br>teljes marketing gép</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SLIDE 24 – INTERAKTÍV CHECKLIST
+═══════════════════════════════════════════════════════ -->
+<div class="slide s-dark" style="overflow-y:auto; padding:40px 64px 100px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+    <span class="section-label" style="color:var(--red); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;">✅ Haladás követés</span>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="cl-stats" style="font-size:13px; color:rgba(255,255,255,.5);">0 / 30 kész</span>
+      <button onclick="clReset()" style="background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.6); font-size:12px; padding:4px 12px; border-radius:20px; cursor:pointer;">Visszaállítás</button>
+    </div>
+  </div>
+  <h2 style="font-size:clamp(22px,2.5vw,36px); margin-bottom:16px;">Teljes feladatlista — pipáld ki ami kész</h2>
+
+  <!-- Progress bar -->
+  <div style="background:rgba(255,255,255,.1); border-radius:4px; height:6px; margin-bottom:32px; overflow:hidden;">
+    <div id="cl-bar" style="height:100%; background:var(--red); width:0%; border-radius:4px; transition:width .4s ease;"></div>
+  </div>
+
+  <div class="grid-2" style="gap:32px; align-items:start;">
+
+    <!-- LEFT COLUMN -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+
+      <div class="cl-group">
+        <div class="cl-group-title">🗓️ 1. hét — Lead Magnet Alap (máj. 14–20.)</div>
+        <label class="cl-item"><input type="checkbox" data-id="c01"> Mailerlite fiók megnyitása és beállítása</label>
+        <label class="cl-item"><input type="checkbox" data-id="c02"> Double opt-in + GDPR megfelelőség</label>
+        <label class="cl-item"><input type="checkbox" data-id="c03"> Welcome sequence 5 email megírva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c04"> /ingyenes-utmutato/ landing oldal él</label>
+        <label class="cl-item"><input type="checkbox" data-id="c05"> PDF letöltés automatizálás tesztelve</label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-title">🗓️ 2. hét — Főoldal + Mérés (máj. 21–27.)</div>
+        <label class="cl-item"><input type="checkbox" data-id="c06"> Hero szöveg outcome-fókuszúra átírva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c07"> Lead magnet szekció beépítve a főoldalba</label>
+        <label class="cl-item"><input type="checkbox" data-id="c08"> Calendly integráció beállítva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c09"> GA4 + Search Console csatolva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c10"> Microsoft Clarity heatmap aktív</label>
+        <label class="cl-item"><input type="checkbox" data-id="c11"> Cookie consent + GDPR szövegek kész</label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-title">🗓️ 3. hét — Első Blog Cikk (máj. 28. – jún. 3.)</div>
+        <label class="cl-item"><input type="checkbox" data-id="c12"> „Mennyibe kerül egy weboldal 2026-ban?" megírva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c13"> SEO optimalizálva (Rank Math / Yoast)</label>
+        <label class="cl-item"><input type="checkbox" data-id="c14"> Blog szekció megnyitva az oldalon</label>
+        <label class="cl-item"><input type="checkbox" data-id="c15"> Cikk megosztva social médián</label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-title">🗓️ 4. hét — Forgalom & Teszt (jún. 4–13.)</div>
+        <label class="cl-item"><input type="checkbox" data-id="c16"> Instagram rendszeres posztolás elindítva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c17"> Meta Ads lead gen kampány tesztelve</label>
+        <label class="cl-item"><input type="checkbox" data-id="c18"> Első 30 nap analitika kiértékelve</label>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+
+      <div class="cl-group">
+        <div class="cl-group-title">📣 2. hónap — Fizetett Forgalom</div>
+        <label class="cl-item"><input type="checkbox" data-id="c19"> Google Ads kampányok elindítva (Általános + Branded)</label>
+        <label class="cl-item"><input type="checkbox" data-id="c20"> Meta Ads lead gen kampány optimalizálva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c21"> Blog cikk #2: „Wix vs. WordPress vs. egyedi"</label>
+        <label class="cl-item"><input type="checkbox" data-id="c22"> Blog cikk #3: „Miért nem hoz ügyfeleket a weboldalad"</label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-title">🏗️ 3. hónap — Landing Oldalak</div>
+        <label class="cl-item"><input type="checkbox" data-id="c23"> Iparági landing oldal #1: /fodrasz-weboldal/</label>
+        <label class="cl-item"><input type="checkbox" data-id="c24"> Iparági landing oldal #2: /kozmetikus-weboldal/</label>
+        <label class="cl-item"><input type="checkbox" data-id="c25"> Első videó testimonial leforgatva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c26"> Blog cikk #4–#5 publikálva</label>
+        <label class="cl-item"><input type="checkbox" data-id="c27"> Első havi hírlevél kiküldve</label>
+      </div>
+
+      <div class="cl-group">
+        <div class="cl-group-title">🚀 4–6. hónap — Skálázás</div>
+        <label class="cl-item"><input type="checkbox" data-id="c28"> Case study oldalak (3–5 db) kész</label>
+        <label class="cl-item"><input type="checkbox" data-id="c29"> Árazás kalkulátor fejlesztve</label>
+        <label class="cl-item"><input type="checkbox" data-id="c30"> Referral program elindítva meglévő ügyfeleknek</label>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- ── Navigation ── -->
+<div class="nav">
+  <button id="btnPrev" onclick="go(-1)">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 23</span>
+  <button id="btnNext" onclick="go(1)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+
+  // Build dots
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(n, total - 1));
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = `${cur + 1} / ${total}`;
+    progress.style.width = `${((cur + 1) / total) * 100}%`;
+    btnPrev.disabled = cur === 0;
+    btnNext.disabled = cur === total - 1;
+  }
+
+  function go(dir) { goTo(cur + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); go(-1); }
+    if (e.key === 'Home') goTo(0);
+    if (e.key === 'End') goTo(total - 1);
+  });
+
+  // Touch/swipe
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  });
+
+  goTo(0);
+
+  // ── CHECKLIST LOGIC ──
+  const CL_KEY = 'mw-checklist-2026';
+
+  function clLoad() {
+    const saved = JSON.parse(localStorage.getItem(CL_KEY) || '{}');
+    document.querySelectorAll('.cl-item input[type="checkbox"]').forEach(cb => {
+      if (saved[cb.dataset.id]) cb.checked = true;
+    });
+    clUpdate();
+  }
+
+  function clUpdate() {
+    const all = document.querySelectorAll('.cl-item input[type="checkbox"]');
+    const done = [...all].filter(cb => cb.checked).length;
+    const pct = Math.round((done / all.length) * 100);
+    document.getElementById('cl-stats').textContent = `${done} / ${all.length} kész (${pct}%)`;
+    document.getElementById('cl-bar').style.width = pct + '%';
+    document.getElementById('cl-bar').style.background =
+      pct === 100 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+  }
+
+  function clSave() {
+    const state = {};
+    document.querySelectorAll('.cl-item input[type="checkbox"]').forEach(cb => {
+      state[cb.dataset.id] = cb.checked;
+    });
+    localStorage.setItem(CL_KEY, JSON.stringify(state));
+    clUpdate();
+  }
+
+  function clReset() {
+    if (!confirm('Biztosan törlöd az összes pipát?')) return;
+    localStorage.removeItem(CL_KEY);
+    document.querySelectorAll('.cl-item input[type="checkbox"]').forEach(cb => cb.checked = false);
+    clUpdate();
+  }
+
+  document.querySelectorAll('.cl-item input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', clSave);
+  });
+
+  clLoad();
+</script>
+</body>
+</html>
